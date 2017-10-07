@@ -12,9 +12,13 @@ Date: 2017/05
 
 class Application
 {
-	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	String m_sProgrammer = "Dante Nardo - dcn5783@rit.edu";
 	std::vector<vector3> m_stopsList;
 	Simplex::Model* m_pModel = nullptr;
+	vector3 m_v3CurrentPos;
+	int m_stopsIndex;
+	float m_speed = .05f;
+
 private:
 	static ImGuiObject gui; //GUI object
 	

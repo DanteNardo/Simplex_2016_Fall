@@ -1,9 +1,10 @@
 #include "AppClass.h"
+
+// Defined an epsilon value for float comparison
+#define EPSILON 1e-01
+
 void Application::InitVariables(void)
 {
-	////Change this to your name and email
-	//m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
-
 	////Alberto needed this at this position for software recording.
 	//m_pWindow->setPosition(sf::Vector2i(710, 0));
 
@@ -29,6 +30,9 @@ void Application::InitVariables(void)
 	m_stopsList.push_back(vector3(5.0f, 2.0f, -5.0f));
 
 	m_stopsList.push_back(vector3(1.0f, 3.0f, -5.0f));
+
+	// Set starting position
+	m_v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
 }
 void Application::Update(void)
 {
@@ -54,21 +58,27 @@ void Application::Display(void)
 	static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
 	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
 
-	//calculate the current position
-	vector3 v3CurrentPos;
+	// Lerp to next stop
+	m_v3CurrentPos = glm::lerp(m_v3CurrentPos, m_stopsList[m_stopsIndex], m_speed);
+
+	// Setup to move to next stop if reached stop
+	vector3 dif = m_v3CurrentPos - m_stopsList[m_stopsIndex];
 	
+	// Convert dif to all positive
+	if (dif.x < 0) dif.x *= -1;
+	if (dif.y < 0) dif.y *= -1;
+	if (dif.z < 0) dif.z *= -1;
 
+	// If the difference is negligible (less than epsilon) then move to next point
+	if (dif.x < EPSILON && dif.y < EPSILON && dif.z < EPSILON)
+	{
+		m_stopsIndex++;
+		if (m_stopsIndex >= m_stopsList.size())
+			m_stopsIndex = 0;
+	}
 
-
-
-	//your code goes here
-	v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
 	//-------------------
-	
-
-
-	
-	matrix4 m4Model = glm::translate(v3CurrentPos);
+	matrix4 m4Model = glm::translate(m_v3CurrentPos);
 	m_pModel->SetModelMatrix(m4Model);
 
 	m_pMeshMngr->Print("\nTimer: ");//Add a line on top

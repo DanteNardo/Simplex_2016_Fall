@@ -16,11 +16,21 @@ Date: 2017/05
 #include "ControllerConfiguration.h"
 #include "imgui\ImGuiObject.h"
 
+// So we can use pow
+#include "math.h"
+
+// Define a custom type for readability
+typedef std::vector<vector3> route;
+
 class Application
 {
 	uint m_uOrbits = 0; //number of shapes starting at 3 and increasing in sides
+	std::vector<float> fTimers;
+	std::vector<int> m_routeIndex;
+	route m_routePositions;
+	std::vector<route> m_routes;
 	std::vector<uint> m_shapeList; //shape index for circles
-	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	String m_sProgrammer = "Dante Nardo - dcn5783@rit.edu";
 	
 private:
 	static ImGuiObject gui; //GUI object
@@ -105,6 +115,16 @@ private:
 	OUTPUT: ---
 	*/
 	void InitVariables(void);
+	/*
+	USAGE: Handles the creation of custom route type based on a fSize and a given number of sides.
+	It creates a route that is effectively a low linecount circle.
+	ARGUMENTS: 
+	float a_fSize -> indicates the distance of the points from the origin
+	uint a_sides -> indicates the total number of route points in the route
+	OUTPUT: 
+	route -> a std::vector<vector3> that represents the points of the low linecount circle.
+	*/
+	route CreateRoute(float a_fSize, uint a_sides);
 	/*
 	USAGE: Reads the configuration of the application to a file
 	ARGUMENTS: ---

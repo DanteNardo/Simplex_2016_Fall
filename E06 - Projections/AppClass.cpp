@@ -3,7 +3,7 @@ using namespace Simplex;
 void Application::InitVariables(void)
 {
 	////Change this to your name and email
-	//m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	m_sProgrammer = "Dante Nardo - dcn5783@rit.edu";
 
 	////Alberto needed this at this position for software recording.
 	//m_pWindow->setPosition(sf::Vector2i(710, 0));
@@ -27,7 +27,7 @@ void Application::InitVariables(void)
 	m_pCamera = new MyCamera();
 
 	//projection used
-	m_uProjection = 1;
+	m_uProjection = 3;
 }
 void Application::Update(void)
 {
@@ -52,26 +52,68 @@ void Application::Display(void)
 	switch (m_uProjection)
 	{
 	default:
+
+	// Regular position, target, and up
 	case 1:
 		m_pCamera->ResetCamera();
 		break;
+	
+	// Default position, target, and up, but orthographic
 	case 2:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPerspective(false);
 		break;
+
+	// Up includes z-rotation and position is rotated to the right
 	case 3:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPerspective(true);
+		m_pCamera->SetPositionTargetAndUp(
+			vector3(30.0f, 0.0f, 0.0f),
+			vector3(0.0f, 0.0f, 0.0f), 
+			vector3(0.0f, 1.0f, -90.0f));
 		break;
+
+	// Position is negative
 	case 4:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPerspective(true);
+		m_pCamera->SetPositionTargetAndUp(
+			vector3(0.0f, 0.0f, -15.0f),
+			vector3(0.0f, 0.0f, 0.0f),
+			vector3(0.0f, 1.0f, 0.0f));
 		break;
+
+	// Position is negative and near plane is increased
 	case 5:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPerspective(true);
+		m_pCamera->SetPositionTargetAndUp(
+			vector3(0.0f, 0.0f, -15.0f),
+			vector3(0.0f, 0.0f, 0.0f),
+			vector3(0.0f, 1.0f, 0.0f));
+		m_pCamera->SetNearFar(vector2(7.0f, 1000.0f));
 		break;
+
+	// Position is negative and far plane is reduced
 	case 6:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPerspective(true);
+		m_pCamera->SetPositionTargetAndUp(
+			vector3(0.0f, 0.0f, -15.0f),
+			vector3(0.0f, 0.0f, 0.0f),
+			vector3(0.0f, 1.0f, 0.0f));
+		m_pCamera->SetNearFar(vector2(0.001f, 10.0f));
 		break;
+
+	// Up is negative
 	case 7:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPerspective(true);
+		m_pCamera->SetPositionTargetAndUp(
+			vector3(0.0f, 0.0f, 10.0f),
+			vector3(0.0f, 0.0f, 0.0f),
+			vector3(0.0f, -1.0f, 0.0f));
 		break;
 	}
 

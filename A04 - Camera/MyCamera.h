@@ -16,7 +16,19 @@ class MyCamera
 	vector3 m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
 	vector3 m_v3Up = vector3(0.0f, 1.0f, 0.0f); //What is up
 
-	bool m_bPerspective = true; //perspective view? False is Orthographic
+	// I added these two variables
+	// They have four relative functions: GetForward, SetForward, GetRight, SetRight
+	// All four functions are commented and defined below and implemented in MyCamera.cpp
+	vector3 m_v3Forward = vector3(0.0f, 0.0f, 0.0f); //Forward pointing vector - direction
+	vector3 m_v3Right = vector3(0.0f, 0.0f, 0.0f); //Right pointing vector - right side
+
+	bool m_bPerspective = true; // Perspective view? False is Orthographic
+
+	// I added these two variables
+	// They have four relative functions: GetAngleX, SetAngleX, GetAngleY, SetAngleY
+	// All four functions are commented and defined below and implemented in MyCamera.cpp
+	float m_fAngleX = 0.0f; // Horizontal angle
+	float m_fAngleY = 3.0f; // Vertical angle
 
 	float m_fFOV = 45.0f; //Field of View
 
@@ -129,6 +141,62 @@ public:
 	OUTPUT: position of the camera
 	*/
 	vector3 GetUp(void);
+
+	/*
+	USAGE: Sets the forward of the camera
+	ARGUMENTS: vector3 a_v3Forward -> What direction the camera is facing
+	OUTPUT: ---
+	*/
+	void SetForward(vector3 a_v3Forward);
+
+	/*
+	USAGE: Gets the forward of the camera
+	ARGUMENTS: ---
+	OUTPUT: the forward facing direction of the camera
+	*/
+	vector3 GetForward();
+
+	/*
+	USAGE: Sets the right of the camera
+	ARGUMENTS: vector3 a_v3Right -> Where is the right side of camera pointing
+	OUTPUT: ---
+	*/
+	void SetRight(vector3 a_v3Right);
+
+	/*
+	USAGE: Gets the right of the camera
+	ARGUMENTS: ---
+	OUTPUT: the right facing direction of the camera
+	*/
+	vector3 GetRight();
+
+	/*
+	USAGE: Sets the horizontal angle of the camera
+	ARGUMENTS: float a_fAngleX -> What the angle should be
+	OUTPUT: ---
+	*/
+	void SetAngleX(float a_fAngleX);
+
+	/*
+	USAGE: Gets the horizontal angle of the camera
+	ARGUMENTS: ---
+	OUTPUT: the horizontal angle of the camera
+	*/
+	float GetAngleX();
+
+	/*
+	USAGE: Sets the vertical angle of the camera
+	ARGUMENTS: float a_fAngleY -> What the angle should be
+	OUTPUT: ---
+	*/
+	void SetAngleY(float a_fAngleY);
+
+	/*
+	USAGE: Gets the vertical angle of the camera
+	ARGUMENTS: ---
+	OUTPUT: the vertical angle of the camera
+	*/
+	float GetAngleY();
 
 	/*
 	USAGE: Sets Perspective Camera

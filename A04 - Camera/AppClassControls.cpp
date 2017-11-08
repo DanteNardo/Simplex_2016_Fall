@@ -344,31 +344,29 @@ void Application::CameraRotation(float a_fSpeed)
 	MouseY = pt.y;
 
 	//Calculate the difference in view with the angle
-	float fAngleX = 0.0f;
-	float fAngleY = 0.0f;
 	float fDeltaMouse = 0.0f;
 	if (MouseX < CenterX)
 	{
 		fDeltaMouse = static_cast<float>(CenterX - MouseX);
-		fAngleY += fDeltaMouse * a_fSpeed;
+		m_pCamera->SetAngleX(m_pCamera->GetAngleX() + (fDeltaMouse * a_fSpeed));
 	}
 	else if (MouseX > CenterX)
 	{
 		fDeltaMouse = static_cast<float>(MouseX - CenterX);
-		fAngleY -= fDeltaMouse * a_fSpeed;
+		m_pCamera->SetAngleX(m_pCamera->GetAngleX() - (fDeltaMouse * a_fSpeed));
 	}
 
 	if (MouseY < CenterY)
 	{
 		fDeltaMouse = static_cast<float>(CenterY - MouseY);
-		fAngleX -= fDeltaMouse * a_fSpeed;
+		m_pCamera->SetAngleY(m_pCamera->GetAngleY() - (fDeltaMouse * a_fSpeed));
 	}
 	else if (MouseY > CenterY)
 	{
 		fDeltaMouse = static_cast<float>(MouseY - CenterY);
-		fAngleX += fDeltaMouse * a_fSpeed;
+		m_pCamera->SetAngleY(m_pCamera->GetAngleY() + (fDeltaMouse * a_fSpeed));
 	}
-	//Change the Yaw and the Pitch of the camera
+
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
 }
 //Keyboard
@@ -385,6 +383,22 @@ void Application::ProcessKeyboard(void)
 
 	if (fMultiplier)
 		fSpeed *= 5.0f;
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+		m_v3Pos += m_pCamera->GetForward() * fSpeed;
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+		m_v3Pos -= m_pCamera->GetForward() * fSpeed;
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+		m_v3Pos += m_pCamera->GetRight() * fSpeed;
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+		m_v3Pos -= m_pCamera->GetRight() * fSpeed;
+	}
 #pragma endregion
 }
 //Joystick
@@ -409,9 +423,15 @@ void Application::ProcessJoystick(void)
 		fHorizontalSpeed *= 3.0f;
 		fVerticalSpeed *= 3.0f;
 	}
+
+	m_pCameraMngr->MoveForward(fForwardSpeed);
+	m_pCameraMngr->MoveSideways(fHorizontalSpeed);
+	m_pCameraMngr->MoveVertical(fVerticalSpeed);
 #pragma endregion
 #pragma region Camera Orientation
 	//Change the Yaw and the Pitch of the camera
+	m_pCameraMngr->ChangeYaw(-m_pController[m_uActCont]->axis[SimplexAxis_U] / 150.0f);
+	m_pCameraMngr->ChangePitch(m_pController[m_uActCont]->axis[SimplexAxis_V] / 150.0f);
 #pragma endregion
 #pragma region ModelOrientation Orientation
 	m_qArcBall = quaternion(vector3(glm::radians(m_pController[m_uActCont]->axis[SimplexAxis_POVY] / 20.0f), 0.0f, 0.0f)) * m_qArcBall;

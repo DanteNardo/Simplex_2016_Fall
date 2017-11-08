@@ -1,9 +1,12 @@
+// Resources used:
+// https://stackoverflow.com/questions/29451567/how-to-move-in-the-direction-of-the-camera-opengl-c
+
 #include "AppClass.h"
 using namespace Simplex;
 void Application::InitVariables(void)
 {
 	////Change this to your name and email
-	//m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	m_sProgrammer = "Dante Nardo - dcn5783@rit.edu";
 
 	////Alberto needed this at this position for software recording.
 	//m_pWindow->setPosition(sf::Vector2i(710, 0));
@@ -53,6 +56,29 @@ void Application::Display(void)
 
 	//Render the list of MyMeshManager
 	m_pMyMeshMngr->Render();
+
+	// Set forward and right vectors for camera space movement
+	// Forward that shows where we are pointing
+	// Right is a vector that points perpendicular to where we are going
+	// You get right from the cross product of the forward direction and up direction
+	const vector3 UP = AXIS_Y;
+	m_pCamera->SetForward(m_pCamera->GetTarget() - m_pCamera->GetPosition());
+	m_pCamera->SetRight(glm::cross(UP, m_pCamera->GetForward()));
+
+	// Determine current direction
+	// This effectively 
+	const float speed = 3.0f;
+	vector3 direction = vector3(
+		cos(m_pCamera->GetAngleY()) * sin(m_pCamera->GetAngleX()),
+		sin(m_pCamera->GetAngleY()),
+		cos(m_pCamera->GetAngleY()) * cos(m_pCamera->GetAngleX())
+	);
+
+	// Set the camera's position and target
+	// Current position = initial + current + direction
+	// Target = current position + direction
+	m_pCamera->SetPosition(vector3(0, 0.0f, 10.0f) + m_v3Pos + direction);
+	m_pCamera->SetTarget(m_pCamera->GetPosition() + direction);
 	
 	//render list call
 	m_uRenderCallCount = m_pMeshMngr->Render();
@@ -70,6 +96,15 @@ void Application::Release(void)
 {
 	//release the singleton
 	MyMeshManager::ReleaseInstance();
+
+	//release model
+	SafeDelete(m_pModel);
+
+	//release primitive
+	SafeDelete(m_pMesh);
+
+	//release primitive
+	SafeDelete(m_pMesh2);
 
 	//release the camera
 	SafeDelete(m_pCamera);

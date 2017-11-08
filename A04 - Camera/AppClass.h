@@ -16,7 +16,14 @@ namespace Simplex
 
 class Application
 {
-	MyCamera* m_pCamera = nullptr; //Camera class
+	vector3 m_v3Pos = vector3(1, 1, 1);
+	matrix4 m_m4View;
+	Model* m_pModel = nullptr; //Model to display
+	matrix4 m_mModel; //Model to world matrix for Steve
+
+	MyMesh* m_pMesh = nullptr; //Primitive to display
+	MyMesh* m_pMesh2 = nullptr; //Primitive to display
+	MyCamera* m_pCamera = nullptr; //camera we will use in this application
 	MyMeshManager* m_pMyMeshMngr = nullptr; //My Mesh Manager
 	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu"; //Programmer
 private:

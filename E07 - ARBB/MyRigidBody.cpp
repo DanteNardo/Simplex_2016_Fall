@@ -82,14 +82,72 @@ void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 	if (a_m4ModelMatrix == m_m4ToWorld)
 		return;
 
+	// Assign model matrix
 	m_m4ToWorld = a_m4ModelMatrix;
 	
 	//your code goes here---------------------
-	m_v3MinG = m_v3MinL;
-	m_v3MaxG = m_v3MaxL;
+
+	// Create an array that stores two rectangles which create a box
+	vector3 v3Box[8];
+
+	// ASCII Drawing showing points on box
+	// Extra credit for amazing art? (Worth a shot)
+	//
+	//   2----3 
+	//  /|   /|
+	// 6----7 |
+	// | |  | |
+	// | 0--|-1
+	// 4/---5/
+
+	// The Back Rectangle
+	v3Box[0] = m_v3MinL;
+	v3Box[1] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MinL.z);
+	v3Box[2] = vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MinL.z);
+	v3Box[3] = vector3(m_v3MaxL.x, m_v3MaxL.y, m_v3MinL.z);
+
+	// The Front Rectangle
+	v3Box[4] = vector3(m_v3MinL.x, m_v3MinL.y, m_v3MaxL.z);
+	v3Box[5] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MaxL.z);
+	v3Box[6] = vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MaxL.z);
+	v3Box[7] = m_v3MaxL;
+
+	// To convert from local space to world space we need to
+	// multiply by the world matrix and then build a vector3
+	// from that data for each original vector3
+	for (int i = 0; i < 8; i++)
+		v3Box[i] = vector3(m_m4ToWorld * vector4(v3Box[i], 1.0f));
+
+	// Find the new max and min values for the box
+	m_v3MaxG = v3Box[0];
+	m_v3MinG = v3Box[0];
+	for (int j = 0; j < 8; j++) {
+
+		// Max and Min X
+		if (m_v3MaxG.x < v3Box[j].x) 
+			m_v3MaxG.x = v3Box[j].x;
+		else if (m_v3MinG.x > v3Box[j].x)
+			m_v3MinG.x = v3Box[j].x;
+
+		// Max and Min Y
+		if (m_v3MaxG.y < v3Box[j].y)
+			m_v3MaxG.y = v3Box[j].y;
+		else if (m_v3MinG.y > v3Box[j].y)
+			m_v3MinG.y = v3Box[j].y;
+
+		// Max and Min Z
+		if (m_v3MaxG.z < v3Box[j].z)
+			m_v3MaxG.z = v3Box[j].z;
+		else if (m_v3MinG.z > v3Box[j].z)
+			m_v3MinG.z = v3Box[j].z;
+	}
+
 	//----------------------------------------
 
 	//we calculate the distance between min and max vectors
+	// Width = m_v3MaxG.x - m_v3MinG.x;
+	// Height = m_v3MaxG.y - m_v3MinG.y;
+	// Length = m_v3MaxG.z - m_v3MinG.z;
 	m_v3ARBBSize = m_v3MaxG - m_v3MinG;
 }
 //The big 3

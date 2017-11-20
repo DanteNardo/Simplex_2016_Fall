@@ -1,3 +1,7 @@
+// Resources Used:
+// - Real Time Collision Detection: Series In Interactive 3D Technology by Christer Ericson
+// - RIT IGME GitHub Repository: physics-SAT3DAABB
+
 #include "MyRigidBody.h"
 using namespace Simplex;
 //Allocation
@@ -103,6 +107,7 @@ void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 	for (uint uIndex = 0; uIndex < 8; ++uIndex)
 	{
 		v3Corner[uIndex] = vector3(m_m4ToWorld * vector4(v3Corner[uIndex], 1.0f));
+		m_v3aPosition[uIndex] = v3Corner[uIndex];
 	}
 
 	//Identify the max and min as the first corner
@@ -276,17 +281,101 @@ void MyRigidBody::AddToRenderList(void)
 
 uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 {
-	/*
-	Your code goes here instead of this comment;
+	#pragma region PointsAndNormalsGeneration
+	// Generate points for computation
+	vector3 aPoints[8];
+	vector3 bPoints[8];
+	for (int i = 0; i < 8; i++) {
+		aPoints[i] = m_v3aPosition[i];
+		bPoints[i] = a_pOther->m_v3aPosition[i];
+	}
 
-	For this method, if there is an axis that separates the two objects
-	then the return will be different than 0; 1 for any separating axis
-	is ok if you are not going for the extra credit, if you could not
-	find a separating axis you need to return 0, there is an enum in
-	Simplex that might help you [eSATResults] feel free to use it.
-	(eSATResults::SAT_NONE has a value of 0)
-	*/
+	// NORMALS CALCULATION
+	std::vector<vector3> aNormals = std::vector<vector3>();
+	std::vector<vector3> bNormals = std::vector<vector3>();
+	aNormals.push_back(glm::normalize(vector3(m_m4ToWorld[0])));
+	aNormals.push_back(glm::normalize(vector3(m_m4ToWorld[1])));
+	aNormals.push_back(glm::normalize(vector3(m_m4ToWorld[2])));
+	bNormals.push_back(glm::normalize(vector3(a_pOther->GetModelMatrix()[0])));
+	bNormals.push_back(glm::normalize(vector3(a_pOther->GetModelMatrix()[1])));
+	bNormals.push_back(glm::normalize(vector3(a_pOther->GetModelMatrix()[2])));
+	#pragma endregion
 
-	//there is no axis test that separates this two objects
+	// SAT TESTING
+	// SAT returns true if the maximum and minimum projections along an axis
+	// (where the axis is determined by the normals) are separated.
+	// ie the maximum projection of one is less than the minimum of another.
+
+	// Optimization: Test last successfully generated separating axis on
+	// the next queries. Due to spacial stuff, this could generate an 
+	// early successful result if the RigidBodies didn't move very much.
+
+	#pragma region SAT - A Normals
+	for (int i = 0; i < aNormals.size(); i++) {
+
+		// Minimum and maximum projections
+		// A = (this object) B = (a_pOther)
+		float projection;
+
+		// Projections for A - Instantiate aMin and aMax
+		float aMin = glm::dot(aPoints[0], aNormals[i]);
+		float aMax = aMin;
+		for (int j = 1; j < 8; j++) {
+			projection = glm::dot(aPoints[j], aNormals[i]);
+			aMin = (aMin > projection) ? projection : aMin;
+			aMax = (aMax < projection) ? projection : aMax;
+		}
+
+		// Projections for B - Instantiate bMin and bMax
+		float bMin = glm::dot(bPoints[0], aNormals[i]);
+		float bMax = bMin;
+		for (int k = 1; k < 8; k++) {
+			projection = glm::dot(bPoints[k], aNormals[i]);
+			bMin = (bMin > projection) ? projection : bMin;
+			bMax = (bMax < projection) ? projection : bMax;
+		}
+		
+		// Check for separation
+		if (aMax < bMin || aMin > bMax) {
+			m_v4PreviousSATTest = vector4(aMin, aMax, bMin, bMax);
+			return 1;
+		}
+	}
+	#pragma endregion
+
+	#pragma region SAT - B Normals
+	for (int i = 0; i < bNormals.size(); i++) {
+
+		// Minimum and maximum projections
+		// A = (this object) B = (a_pOther)
+		float projection;
+
+		// Projections for A - Instantiate aMin and aMax
+		float aMin = glm::dot(aPoints[0], bNormals[i]);
+		float aMax = aMin;
+		for (int j = 1; j < 8; j++) {
+			projection = glm::dot(aPoints[j], bNormals[i]);
+			aMin = (aMin > projection) ? projection : aMin;
+			aMax = (aMax < projection) ? projection : aMax;
+		}
+
+		// Projections for B - Instantiate bMin and bMax
+		float bMin = glm::dot(bPoints[0], bNormals[i]);
+		float bMax = bMin;
+		for (int k = 1; k < 8; k++) {
+			projection = glm::dot(bPoints[k], bNormals[i]);
+			bMin = (bMin > projection) ? projection : bMin;
+			bMax = (bMax < projection) ? projection : bMax;
+		}
+
+		// Check for separation
+		if (aMax < bMin || aMin > bMax) {
+			m_v4PreviousSATTest = vector4(aMin, aMax, bMin, bMax);
+			return 1;
+		}
+	}
+	#pragma endregion
+
+	// There is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
 }

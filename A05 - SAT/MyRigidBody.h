@@ -20,6 +20,7 @@ class MyRigidBody
 	bool m_bVisibleARBB = true; //Visibility of axis (Re)aligned bounding box
 
 	float m_fRadius = 0.0f; //Radius
+	vector4 m_v4PreviousSATTest; //Stores the min and max values from the previous SAT test
 
 	vector3 m_v3ColorColliding = C_RED; //Color when colliding
 	vector3 m_v3ColorNotColliding = C_WHITE; //Color when not colliding
@@ -39,6 +40,7 @@ class MyRigidBody
 	std::set<MyRigidBody*> m_CollidingRBSet; //set of rigid bodies this one is colliding with
 
 public:
+	vector3 m_v3aPosition[8]; //Stores the corners of the obb
 	/*
 	Usage: Constructor
 	Arguments: std::vector<vector3> a_pointList -> list of points to make the Rigid Body for

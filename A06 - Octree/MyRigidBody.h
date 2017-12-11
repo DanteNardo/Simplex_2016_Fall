@@ -37,6 +37,8 @@ class MyRigidBody
 	vector3 m_v3HalfWidth = ZERO_V3; //half the size of the Oriented Bounding Box
 	vector3 m_v3ARBBSize = ZERO_V3;// size of the Axis (Re)Alligned Bounding Box
 
+	vector3 m_v3AABB[8]; // vector3 array that contains Axis Aligned Bounding Box
+
 	matrix4 m_m4ToWorld = IDENTITY_M4; //Matrix that will take us from local to world coordinate
 
 	uint m_nCollidingCount = 0; //size of the colliding set
@@ -223,6 +225,12 @@ public:
 	Output: model to world matrix
 	*/
 	matrix4 GetModelMatrix(void);
+	/*
+	Usage: Gets AABB
+	Arguments: ---
+	Output: aixs aligned bounding box array
+	*/
+	vector3* GetAABB(void);
 	/*
 	Usage: Sets Model to World matrix
 	Arguments: Model to World matrix

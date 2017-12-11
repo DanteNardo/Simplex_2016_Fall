@@ -2,27 +2,29 @@
 Programmer: Alberto Bobadilla (labigm@gmail.com)
 Date: 2017/06
 ----------------------------------------------*/
-#ifndef __APPLICATIONCLASS_H_
-#define __APPLICATIONCLASS_H_
+#pragma once
 
 #include "Definitions.h"
 
 #include "ControllerConfiguration.h"
 #include "imgui\ImGuiObject.h"
 
-#include "MyEntityManager.h"
+#include "MyOctant.h"
 
 namespace Simplex
 {
-	//Adding Application to the Simplex namespace
+
 class Application
 {
 	MyEntityManager* m_pEntityMngr = nullptr; //Entity Manager
+	MyOctant* m_pRoot = nullptr; //Octree pointer
+	AABB* m_pRootAABB = nullptr; //World AABB
 	uint m_uOctantID = -1; //Index of Octant to display
 	uint m_uObjects = 0; //Number of objects in the scene
 	uint m_uOctantLevels = 0; //Number of levels in the octree
+
 private:
-	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu"; //programmer
+	String m_sProgrammer = "Dante Nardo - dcn5783@rit.edu"; //programmer
 
 	static ImGuiObject gui; //GUI object
 	bool m_bGUI_Main = true; //show Main GUI window?
@@ -330,11 +332,3 @@ private:
 };
 
 }//namespace Simplex
-
-#endif //__APPLICATIONCLASS_H_
-
-/*
-USAGE:
-ARGUMENTS: ---
-OUTPUT: ---
-*/

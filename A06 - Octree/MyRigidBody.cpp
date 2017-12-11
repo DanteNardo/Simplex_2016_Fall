@@ -82,6 +82,7 @@ vector3 MyRigidBody::GetMinGlobal(void) { return m_v3MinG; }
 vector3 MyRigidBody::GetMaxGlobal(void) { return m_v3MaxG; }
 vector3 MyRigidBody::GetHalfWidth(void) { return m_v3HalfWidth; }
 matrix4 MyRigidBody::GetModelMatrix(void) { return m_m4ToWorld; }
+vector3* MyRigidBody::GetAABB(void) { return m_v3AABB; }
 void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 {
 	//to save some calculations if the model matrix is the same there is nothing to do here
@@ -94,39 +95,39 @@ void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 	m_v3CenterG = vector3(m_m4ToWorld * vector4(m_v3CenterL, 1.0f));
 
 	//Calculate the 8 corners of the cube
-	vector3 v3Corner[8];
+
 	//Back square
-	v3Corner[0] = m_v3MinL;
-	v3Corner[1] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MinL.z);
-	v3Corner[2] = vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MinL.z);
-	v3Corner[3] = vector3(m_v3MaxL.x, m_v3MaxL.y, m_v3MinL.z);
+	m_v3AABB[0] = m_v3MinL;
+	m_v3AABB[1] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MinL.z);
+	m_v3AABB[2] = vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MinL.z);
+	m_v3AABB[3] = vector3(m_v3MaxL.x, m_v3MaxL.y, m_v3MinL.z);
 
 	//Front square
-	v3Corner[4] = vector3(m_v3MinL.x, m_v3MinL.y, m_v3MaxL.z);
-	v3Corner[5] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MaxL.z);
-	v3Corner[6] = vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MaxL.z);
-	v3Corner[7] = m_v3MaxL;
+	m_v3AABB[4] = vector3(m_v3MinL.x, m_v3MinL.y, m_v3MaxL.z);
+	m_v3AABB[5] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MaxL.z);
+	m_v3AABB[6] = vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MaxL.z);
+	m_v3AABB[7] = m_v3MaxL;
 
 	//Place them in world space
 	for (uint uIndex = 0; uIndex < 8; ++uIndex)
 	{
-		v3Corner[uIndex] = vector3(m_m4ToWorld * vector4(v3Corner[uIndex], 1.0f));
+		m_v3AABB[uIndex] = vector3(m_m4ToWorld * vector4(m_v3AABB[uIndex], 1.0f));
 	}
 
 	//Identify the max and min as the first corner
-	m_v3MaxG = m_v3MinG = v3Corner[0];
+	m_v3MaxG = m_v3MinG = m_v3AABB[0];
 
 	//get the new max and min for the global box
 	for (uint i = 1; i < 8; ++i)
 	{
-		if (m_v3MaxG.x < v3Corner[i].x) m_v3MaxG.x = v3Corner[i].x;
-		else if (m_v3MinG.x > v3Corner[i].x) m_v3MinG.x = v3Corner[i].x;
+		if (m_v3MaxG.x < m_v3AABB[i].x) m_v3MaxG.x = m_v3AABB[i].x;
+		else if (m_v3MinG.x > m_v3AABB[i].x) m_v3MinG.x = m_v3AABB[i].x;
 
-		if (m_v3MaxG.y < v3Corner[i].y) m_v3MaxG.y = v3Corner[i].y;
-		else if (m_v3MinG.y > v3Corner[i].y) m_v3MinG.y = v3Corner[i].y;
+		if (m_v3MaxG.y < m_v3AABB[i].y) m_v3MaxG.y = m_v3AABB[i].y;
+		else if (m_v3MinG.y > m_v3AABB[i].y) m_v3MinG.y = m_v3AABB[i].y;
 
-		if (m_v3MaxG.z < v3Corner[i].z) m_v3MaxG.z = v3Corner[i].z;
-		else if (m_v3MinG.z > v3Corner[i].z) m_v3MinG.z = v3Corner[i].z;
+		if (m_v3MaxG.z < m_v3AABB[i].z) m_v3MaxG.z = m_v3AABB[i].z;
+		else if (m_v3MinG.z > m_v3AABB[i].z) m_v3MinG.z = m_v3AABB[i].z;
 	}
 
 	//we calculate the distance between min and max vectors
